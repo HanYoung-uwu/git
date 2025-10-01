@@ -2517,6 +2517,16 @@ static enum ref_transaction_error split_symref_update(struct ref_update *update,
 	unsigned int new_flags;
 
 	/*
+	 * Check the referent is valid before adding it to the transaction.
+	 */
+	if (!refname_is_safe(referent)) {
+		strbuf_addf(err,
+			    "reference '%s' appears to be broken",
+			    update->refname);
+		return -1;
+	}
+
+	/*
 	 * First make sure that referent is not already in the
 	 * transaction. This check is O(lg N) in the transaction
 	 * size, but it happens at most once per symref in a
